@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: robotframework-openstflibrary
+Version: 0.1.0
+Summary: OpenSTF utility library for Robot Framework
+Home-page: https://github.com/ravihuang/Robotframework-OpenstfLibrary
+Author: Ravi Huang
+Author-email: ravi.huang@gmail.com
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires: robotframework
