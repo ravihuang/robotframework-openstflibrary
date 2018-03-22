@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 from robot.api import logger
-import os,urlparse,time
+import os,urlparse,time,logging
 from pyswagger import App, Security
 from pyswagger.contrib.client.requests import Client
 from pyswagger.utils import jp_compose
@@ -34,6 +34,12 @@ class OpenstfLibrary:
     | ${x} | get idle device
     """
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'    
+    def __init__(self):
+        self.set_swagger_log_level(logging.WARN)
+
+    def set_swagger_log_level(self,level):
+        logging.getLogger("pyswagger.core").setLevel(int(level))
+
     def connect_to_stf(self,host,token):
         self.app = App._create_('http://%s/api/v1/swagger.json' % host)
         auth = Security(self.app)
