@@ -14,8 +14,8 @@ Description:
         --------------------------
         
         **robotframework-stublibrary** is a `Robot Framework
-        <http://code.google.com/p/robotframework/>`_ test library for openstf
-        needs. It uses `pyswagger <http://webtest.pythonpaste.org/>`_ library
+        <https://github.com/robotframework/robotframework>`_ test library for openstf
+        needs. It uses `pyswagger <https://pypi.python.org/pypi/pyswagger>`_ library
         underneath now.
         
         Installation
@@ -45,7 +45,8 @@ Description:
          Test Case    Action                             Argument
         ============  =================================  ===================================
         Example
-        
+                      Connect To Stf    192.168.117.155:7100    8ad3024193ba44a1820afef3060df8934d964599b74049d4b11b9c3f9edb5457
+                      ${x}              Get Idle Device
         ============  =================================  ===================================
         
         
@@ -82,7 +83,7 @@ Description:
         
 Keywords: robotframework testing testautomation openstf android
 Platform: any
-Classifier: Development Status :: 5 - Production/Stable
+Classifier: Development Status :: 2 - Pre-Alpha
 Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python
