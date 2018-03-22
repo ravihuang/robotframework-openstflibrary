@@ -12,61 +12,61 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import os,urlparse
+from robot.api import logger
+import os,urlparse,time
+from pyswagger import App, Security
+from pyswagger.contrib.client.requests import Client
+from pyswagger.utils import jp_compose
 
-from OpenstfLibrary.commons import Commons
-
-__version_file_path__ = os.path.join(os.path.dirname(__file__), 'VERSION')
-__version__ = open(__version_file_path__, 'r').read().strip()
+__version__ = '0.1.0'
 
 
-class OpenstfLibrary(Commons):
+class OpenstfLibrary:
     """
-    Stub Library contains utilities meant for Robot Framework's usage.
-
+    Openstf Library contains utilities meant for Robot Framework's usage.
     This can allow you to stub a interface for your client test
-
-
     References:
-
      + abc - http://
-
     Notes:
-
     `compatible* - or at least theoretically it should be compatible. Currently tested only with win7`
-
     Example Usage:
-    | # Setup |
-    | Create Server | http://127.0.0.1/if
-    | # Guard assertion (verify that test started in expected state). |
-    | Add Route | /orders | {"name":"iphone","quantity":123}
-    | # Teardown |
-    | Close Server |
+    | connect to stf | localhost | token
+    | ${x} | get idle device
     """
-
-    ROBOT_LIBRARY_SCOPE = 'GLOBAL'
-    __servers = []
-    __STUBS={'http':HTTP}
+    ROBOT_LIBRARY_SCOPE = 'GLOBAL'    
+    def connect_to_stf(self,host,token):
+        self.app = App._create_('http://%s/api/v1/swagger.json' % host)
+        auth = Security(self.app)
+        auth.update_with('accessTokenAuth', 'Bearer '+token)
+        self.client = Client(auth)
     
-    def load_spec(self,sfile,auth):
-        url=urlparse.urlparse(url)
-         
-        stub=StubLibrary.__STUBS.get(url.scheme.lower(),None)
-        if stub is None:
-            raise Exception("not support server: %s" % url.scheme)
-
-        self.svr=stub(url)
-        StubLibrary.__servers.append(self.svr)
-
-        return self.svr
-
+    def get_user_name(self):
+        user=self.__req('getUser') 
+        if not (user and user['success']):
+            return None
+        return user['user']['name']
     
-    def set_auth(self,auth_key,auth_value):
-        self.svr.shutdown()
-        
-    def request(self,opid,**kwargs):
-        for i in StubLibrary.__servers:
-            i.shutdown()
-        
-    def switch_server(self,svr):
-        self.svr=svr    
+    def get_user_devices(self):
+        rst=self.__req('getUserDevices')     
+        if not(rst['success'] and rst['devices']):
+            return None    
+        return rst['devices']
+    def __req(self,op):
+        req, resp = self.app.op[op]()
+        loop=5
+        while True and loop:
+            rst=self.client.request((req, resp))
+            rst=rst.data
+            if rst['success']:
+                logger.debug(rst)
+                return rst
+            time.sleep(3)   
+            loop-=1
+        return None
+    def get_idle_device(self):
+        rst=self.__req('getDevices')
+        for i in rst['devices']:
+            if i['using']:
+                continue
+            return i['serial']
+        return None  

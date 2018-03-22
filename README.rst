@@ -6,8 +6,8 @@ robotframework-openstflibrary
 --------------------------
 
 **robotframework-stublibrary** is a `Robot Framework
-<http://code.google.com/p/robotframework/>`_ test library for openstf
-needs. It uses `pyswagger <http://webtest.pythonpaste.org/>`_ library
+<https://github.com/robotframework/robotframework>`_ test library for openstf
+needs. It uses `pyswagger <https://pypi.python.org/pypi/pyswagger>`_ library
 underneath now.
 
 Installation
@@ -37,7 +37,8 @@ Library       OpenstfLibrary
  Test Case    Action                             Argument
 ============  =================================  ===================================
 Example
-
+              Connect To Stf    192.168.117.155:7100    8ad3024193ba44a1820afef3060df8934d964599b74049d4b11b9c3f9edb5457
+              ${x}              Get Idle Device
 ============  =================================  ===================================
 
 

@@ -1,36 +1,53 @@
 from pyswagger import App, Security
 from pyswagger.contrib.client.requests import Client
 from pyswagger.utils import jp_compose
+import logging,time
+logging.basicConfig()
+logger=logging.getLogger('stf')
+logger.setLevel(logging.DEBUG)
+def connect_to_stf(host,token):
+    global app,client
+    app = App._create_('http://%s/api/v1/swagger.json' % host)
+    auth = Security(app)
+    auth.update_with('accessTokenAuth', 'Bearer '+token)
+    client = Client(auth)
 
-# load Swagger resource file into App object
-app = App._create_('http://192.168.164.135:7100/api/v1/swagger.json')
-auth = Security(app)
-#auth.update_with('api_key', '12312312312312312313q') # api key
-auth.update_with('accessTokenAuth', 'Bearer 0f55cdd792c34e74b879d07ab29bb6a9ed5e730728e541e09d49b69ebab5c8bb') # oauth2
+def get_user_name():
+    req, resp = app.op['getUser']()
+    user = client.request((req, resp)).data
+    logger.debug(user)
+    if not (user and user['success']):
+        return None
+    return user['user']['name']
 
-# init swagger client
-client = Client(auth)
+def get_user_devices():
+    rst=__req('getUserDevices')     
+    if not(rst['success'] and rst['devices']):
+        return None    
+    return rst['devices']
+def __req(op):
+    req, resp = app.op[op]()
+    loop=5
+    while True and loop:
+        rst=client.request((req, resp))
+        rst=rst.data
+        if rst['success']:
+            logger.debug(rst)
+            return rst
+        time.sleep(3)   
+        loop-=1
+    return None
+def get_idle_device():
+    rst=__req('getDevices')
+    for i in rst['devices']:
+        if i['using']:
+            continue
+        return i['serial']
+    return None
+    
+connect_to_stf('192.168.117.155:7100','8ad3024193ba44a1820afef3060df8934d964599b74049d4b11b9c3f9edb5457')
+print get_user_name()
+print getUserDevices()
+print getIdleDevice()
+print __req('getUserAccessTokens')
 
-
-# a dict is enough for representing a Model in Swagger
-#pet_Tom=dict(id=1, name='Tom', photoUrls=['http://test']) 
-# a request to create a new pet
-#client.request(app.op['addPet'](body=pet_Tom))
-
-# - access an Operation object via App.op when operationId is defined
-# - a request to get the pet back
-req, resp = app.op['getUser']()
-
-# prefer json as response
-#req.produce('application/json')
-user = client.request((req, resp)).data
-print(user)
-#assert pet.id == 1
-#assert pet.name == 'Tom'
-
-## new ways to get Operation object corresponding to 'getPetById'.
-## 'jp_compose' stands for JSON-Pointer composition
-#req, resp = app.resolve(jp_compose('/pet/{petId}', base='#/paths')).get(petId=1)
-#req.produce('application/json')
-#pet = client.request((req, resp)).data
-#assert pet.id == 1
