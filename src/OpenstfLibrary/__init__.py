@@ -18,7 +18,7 @@ from pyswagger import App, Security
 from pyswagger.contrib.client.requests import Client
 from pyswagger.utils import jp_compose
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class OpenstfLibrary:

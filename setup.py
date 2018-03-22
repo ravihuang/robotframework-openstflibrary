@@ -35,8 +35,8 @@ Framework :: Robot Framework :: Library
 '''.strip().splitlines()
 with open(join(CURDIR, 'src', 'OpenstfLibrary', '__init__.py')) as f:
     VERSION = re.search("\n__version__ = '(.*)'", f.read()).group(1)
-with open(join(CURDIR, 'README.rst')) as f:
-    DESCRIPTION = f.read()
+with open(join(CURDIR, 'README.rst'),'rb') as f:
+    DESCRIPTION = str(f.read())
 
 setup(
     name             = 'robotframework-openstflibrary',
@@ -50,7 +50,7 @@ setup(
     keywords         = 'robotframework testing testautomation openstf android',
     platforms        = 'any',
     classifiers      = CLASSIFIERS,
-    install_requires = ['robotframework','pyswagger'],
+    install_requires = ['robotframework\n','pyswagger'],
     package_dir      = {'': 'src'},
     packages         = find_packages('src')
 )
