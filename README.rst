@@ -1,6 +1,9 @@
 
 .. image:: https://secure.travis-ci.org/ravihuang/robotframework-openstflibrary.png?branch=master
   :target: http://travis-ci.org/ravihuang/robotframework-openstflibrary
+OpenstfLibrary
+=============================
+.. contents::
 
 robotframework-openstflibrary
 --------------------------
@@ -13,12 +16,12 @@ underneath now.
 Compile
 ------------
 Env:
-    pip install wheel twine -i https://pypi.douban.com/simple
+  pip install wheel twine -i https://pypi.douban.com/simple
 dist：
-    python setup.py sdist bdist_wheel --universal
+  python setup.py sdist bdist_wheel --universal
 upload to pypi:
-    twine upload --config-file c:\Users\Administrator\.pypirc dist\*
-    
+  twine upload --config-file c:\Users\Administrator\.pypirc dist\*
+
 Installation
 ------------
 
