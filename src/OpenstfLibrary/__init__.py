@@ -13,7 +13,11 @@
 #  limitations under the License.
 
 from robot.api import logger
-import os,urlparse,time,logging
+import os,time,logging
+try:
+    import urlparse
+except:
+    import urllib.parse
 from pyswagger import App, Security
 from pyswagger.contrib.client.requests import Client
 from pyswagger.utils import jp_compose
