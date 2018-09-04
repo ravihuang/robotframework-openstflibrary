@@ -13,7 +13,11 @@
 #  limitations under the License.
 
 from robot.api import logger
-import os,urlparse,time,logging
+import os,time
+try:
+    import urlparse
+except:
+    import urllib.parse
 from pyswagger import App, Security
 from pyswagger.contrib.client.requests import Client
 from pyswagger.utils import jp_compose
@@ -33,13 +37,30 @@ class OpenstfLibrary:
     | connect to stf | localhost | token
     | ${x} | get idle device
     """
-    ROBOT_LIBRARY_SCOPE = 'GLOBAL'    
-    def __init__(self):
-        self.set_swagger_log_level(logging.WARN)
-
-    def set_swagger_log_level(self,level):
-        logging.getLogger("pyswagger.core").setLevel(int(level))
-
+    ROBOT_LIBRARY_SCOPE = 'GLOBAL'
+    
+    def __req(self,op,**para):
+        req,resp=self.app.op[op](**para)
+        loop=1
+        content = None
+        while True and loop:
+            try:
+                rst=self.client.request((req, resp))
+            except Exception as err:
+                logger.info('request error by {0}'.format(err))
+                time.sleep(3)
+                loop-=1
+                continue
+            logger.info(rst.status)
+            logger.info(rst.data)
+            content=rst.data
+            if rst.status == 200 and (content is None):
+                break
+            time.sleep(3)
+            loop-=1
+        logger.debug(content)
+        return content
+        
     def connect_to_stf(self,host,token):
         self.app = App._create_('http://%s/api/v1/swagger.json' % host)
         auth = Security(self.app)
@@ -57,22 +78,47 @@ class OpenstfLibrary:
         if not(rst['success'] and rst['devices']):
             return None    
         return rst['devices']
-    def __req(self,op):
-        req, resp = self.app.op[op]()
-        loop=5
-        while True and loop:
-            rst=self.client.request((req, resp))
-            rst=rst.data
-            if rst['success']:
-                logger.debug(rst)
-                return rst
-            time.sleep(3)   
-            loop-=1
-        return None
+        
     def get_idle_device(self):
         rst=self.__req('getDevices')
         for i in rst['devices']:
-            if i['using']:
+            if i['using'] or (not i['present']):
                 continue
             return i['serial']
-        return None  
+        return None
+        
+    def get_devices(self):
+        rst=self.__req('getDevices')
+        if not(rst['success'] and rst['devices']):
+            return None
+        return rst ['devices']
+        
+    def get_device_by_serial(self,ser):
+        rst = self.__req('getDeviceBySerial',serial=ser)
+        if not(rst['success'] and rst['device']):
+            return None
+        return rst['device']
+    
+    def get_user(self):
+        user=self.__req('getUser') 
+        if not (user and user['success']):
+            return None
+        return user['user']
+    
+    def add_user_device(self,ser,timeout=90000):
+        rst=self.__req('addUserDevice',device = {'serial':ser,'timeout':timeout})
+    
+    def delete_user_device(self,ser):
+        rst=self.__req('deleteUserDeviceBySerial',serial=ser)
+    
+    def remote_connect_user_device_by_serial(self,ser):
+        rst = self.__req(op='remoteConnectUserDeviceBySerial', serial = ser)
+        if not(rst['success'] and rst['remoteConnectUrl']):
+            return None
+        return rst['remoteConnectUrl']
+    
+    def remote_disconnect_user_device_by_serial(self,ser):
+        rst = self.__req(op='remoteDisconnectUserDeviceBySerial',serial=ser)
+        if not(rst['success'] and rst['remoteConnectUrl']):
+            return None
+        return rst['remoteConnectUrl']
