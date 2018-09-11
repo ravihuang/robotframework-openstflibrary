@@ -111,13 +111,13 @@ class OpenstfLibrary:
     def delete_user_device(self,ser):
         rst=self.__req('deleteUserDeviceBySerial',serial=ser)
     
-    def remote_connect_user_device_by_serial(self,ser):
+    def remote_connect_device(self,ser):
         rst = self.__req(op='remoteConnectUserDeviceBySerial', serial = ser)
         if not(rst['success'] and rst['remoteConnectUrl']):
             return None
         return rst['remoteConnectUrl']
     
-    def remote_disconnect_user_device_by_serial(self,ser):
+    def remote_disconnect_device(self,ser):
         rst = self.__req(op='remoteDisconnectUserDeviceBySerial',serial=ser)
         if not(rst['success'] and rst['remoteConnectUrl']):
             return None
